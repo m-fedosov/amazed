@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class Console {
     Scanner scanner;
+
     Console() {
         scanner = new Scanner(System.in);
     }
@@ -13,6 +14,7 @@ public class Console {
         System.out.println(text);
     }
 
+    @SuppressWarnings("RegexpSinglelineJava")
     public int input(int minValue, int maxValue) {
         int value = -1;
         String input;
