@@ -3,10 +3,9 @@ package backend.academy.amazed;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 public class MazeGrid {
-    @Getter
     private final int width;
-    @Getter
     private final int height;
     private final Cell[][] grid;
 
@@ -19,7 +18,7 @@ public class MazeGrid {
         int cnt = 0;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                grid[i][j] = new Cell(cnt++);
+                grid[i][j] = new Cell(cnt++, i, j);
             }
         }
     }
@@ -29,8 +28,8 @@ public class MazeGrid {
         StringBuilder builder = new StringBuilder();
 
         // Проходим по каждой клетке
-        for (int y = 0; y < height() - 1; y++) {
-            for (int x = 0; x < width() - 1; x++) {
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
                 builder.append("██");
                 if (grid[y][x].northWall())  {
                     builder.append("██");
@@ -40,7 +39,7 @@ public class MazeGrid {
             }
             builder.append("██");
             builder.append("\n");
-            for (int x = 0; x < width() - 1; x++) {
+            for (int x = 0; x < width(); x++) {
                 if (grid[y][x].westWall())  {
                     builder.append("██");
                 } else {
@@ -56,7 +55,7 @@ public class MazeGrid {
             builder.append("\n");
         }
 
-        for (int x = 0; x < width() - 1; x++) {
+        for (int x = 0; x < width(); x++) {
             builder.append("██");
             if (grid[height() - 1][x].southWall())  {
                 builder.append("██");
@@ -70,6 +69,17 @@ public class MazeGrid {
         return builder.toString();
     }
 
+    Cell getCell(int y, int x) {
+        if (y < 0 || y >= height() || x < 0 || x >= width()) {
+            return null;
+        }
+        return grid[y][x];
+    }
+
+    void setCell(Cell cell) {
+        grid[cell.y()][cell.x()] = cell;
+    }
+
     @Getter @Setter
     static class Cell {
         private boolean northWall = true;
@@ -78,9 +88,13 @@ public class MazeGrid {
         private boolean eastWall = true;
 
         int type;
+        int y;
+        int x;
 
-        Cell(int type) {
+        Cell(int type, int y, int x) {
             this.type = type;
+            this.y = y;
+            this.x = x;
         }
     }
 }

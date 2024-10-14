@@ -11,9 +11,9 @@ public class MazeSetup {
     MazeGrid mazeGrid;
 
     @SuppressWarnings("MagicNumber")
-    int minSize = 10;
+    int minSize = 4;
     @SuppressWarnings("MagicNumber")
-    int maxSize = 500;
+    int maxSize = 40;
 
     public void setUp() {
         Console console = new Console();
@@ -44,7 +44,8 @@ public class MazeSetup {
 //        int algorithmChoice = console.input(1, 3);
 
         mazeGrid = new MazeGrid(width, height);
-//        MazeGenerator.generate(mazeGrid);
+        MazeGenerator mazeGenerator = new MazeGenerator();
+        mazeGrid = mazeGenerator.generate(mazeGrid);
         console.print(mazeGrid.draw());
 
 //        console.print("Начало лабиринта:");
