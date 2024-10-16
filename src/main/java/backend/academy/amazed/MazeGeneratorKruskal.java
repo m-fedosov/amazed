@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class MazeGenerator {
+public class MazeGeneratorKruskal {
     MazeGrid mazeGrid;
     HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells;
 
-    MazeGrid.Cell onCell;
     MazeGrid.Cell northCell;
     MazeGrid.Cell southCell;
     MazeGrid.Cell westCell;
     MazeGrid.Cell eastCell;
-    ArrayList<MazeGrid.Cell> notVisitedCells;
 
     private HashMap<Integer, ArrayList<MazeGrid.Cell>> getPathToCells(MazeGrid mazeGrid) {
         HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells = new HashMap<>();

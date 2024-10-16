@@ -44,7 +44,7 @@ public class MazeSetup {
 //        int algorithmChoice = console.input(1, 3);
 
         mazeGrid = new MazeGrid(width, height);
-        MazeGenerator mazeGenerator = new MazeGenerator();
+        MazeGeneratorPrim mazeGenerator = new MazeGeneratorPrim();
         mazeGrid = mazeGenerator.generate(mazeGrid);
         console.print(mazeGrid.draw());
 
