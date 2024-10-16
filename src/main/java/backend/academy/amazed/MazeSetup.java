@@ -5,8 +5,6 @@ import lombok.Getter;
 public class MazeSetup {
     int width;
     int height;
-    Point startPoint;
-    Point endPoint;
     @Getter
     MazeGrid mazeGrid;
 
@@ -32,63 +30,49 @@ public class MazeSetup {
         width = console.input(minSize, maxSize);
         console.print("Высота генерируемого лабиринта");
         height = console.input(minSize, maxSize);
+        mazeGrid = new MazeGrid(height, width);
 
-//        String algorithmChoiceText = """
-//            Выберите алгоритм генерации лабиринта:
-//
-//            1. Kruskal's Algorithm
-//            2. Алгоритм Краскала
-//            """;
-//        console.print(algorithmChoiceText);
-//        @SuppressWarnings("MagicNumber")
-//        int algorithmChoice = console.input(1, 3);
+        String algorithmChoiceText = """
+            Выберите алгоритм генерации лабиринта:
 
-        mazeGrid = new MazeGrid(width, height);
-        MazeGeneratorPrim mazeGenerator = new MazeGeneratorPrim();
-        mazeGrid = mazeGenerator.generate(mazeGrid);
+            1. Алгоритм Прима
+            2. Алгоритм Краскала
+            """;
+        console.print(algorithmChoiceText);
+        @SuppressWarnings("MagicNumber")
+        int algorithmChoice = console.input(1, 2);
+
+        if (algorithmChoice == 1) {
+            MazeGeneratorPrim mazeGenerator = new MazeGeneratorPrim();
+            mazeGrid = mazeGenerator.generate(mazeGrid);
+        } else if (algorithmChoice == 2) {
+            MazeGeneratorKruskal mazeGenerator = new MazeGeneratorKruskal();
+            mazeGrid = mazeGenerator.generate(mazeGrid);
+        }
+
+        console.print("Начало лабиринта:");
+        int y1 = console.input(0, height - 1);
+        int x1 = console.input(0, width - 1);
+        MazeGrid.Cell startCell = new MazeGrid.Cell(0, y1, x1);
+
+        console.print("Конец лабиринта:");
+        int y2 = console.input(0, height - 1);
+        int x2 = console.input(0, width - 1);
+        MazeGrid.Cell endCell = new MazeGrid.Cell(0, y2, x2);
+
+        // Проверка на совпадение начальной и конечной точек
+        while (startCell.equals(endCell)) {
+            console.print(
+                "Начальная и конечная точки совпадают. Пожалуйста, выберите другие координаты для конца лабиринта."
+            );
+            x2 = console.input(0, width - 1);
+            y2 = console.input(0, height - 1);
+            endCell = new MazeGrid.Cell(0, y2, x2);
+        }
+
+        mazeGrid.startCell(startCell);
+        mazeGrid.endCell(endCell);
+
         console.print(mazeGrid.draw());
-
-//        console.print("Начало лабиринта:");
-//        int x1 = console.input(1, width) - 1;
-//        int y1 = console.input(1, height) - 1;
-//        startPoint = new Point(x1, y1);
-//
-//        console.print("Конец лабиринта:");
-//        int x2 = console.input(1, width) - 1;
-//        int y2 = console.input(1, height) - 1;
-//        endPoint = new Point(x2, y2);
-//
-//        // Проверка на совпадение начальной и конечной точек
-//        while (startPoint.equals(endPoint)) {
-//            console.print(
-//                "Начальная и конечная точки совпадают. Пожалуйста, выберите другие координаты для конца лабиринта."
-//            );
-//            x2 = console.input(1, width) - 1;
-//            y2 = console.input(1, height) - 1;
-//            endPoint = new Point(x2, y2);
-//        }
-    }
-
-    private static class Point {
-        int x;
-        int y;
-
-        Point(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        @SuppressWarnings("EqualsHashCode")
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-            Point point = (Point) obj;
-            return x == point.x && y == point.y;
-        }
     }
 }
