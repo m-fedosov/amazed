@@ -10,10 +10,9 @@ public class MazeGrid {
     private final String SPACE = "⬛️";
     private final String START = "🟩";
     private final String END   = "🟥";
+    private final String PATH  = "🟨";
 
-    @Setter
     private Cell startCell;
-    @Setter
     private Cell endCell;
     private final int width;
     private final int height;
@@ -39,19 +38,26 @@ public class MazeGrid {
 
         // Проходим по каждой клетке
         for (int y = 0; y < height(); y++) {
+            // нарисовать северную границу клетки
             for (int x = 0; x < width(); x++) {
                 builder.append(WALL);
                 if (grid[y][x].northWall())  {
                     builder.append(WALL);
+                } else if (grid[y][x].partOfPath() && grid[y - 1][x].partOfPath()) {
+                    builder.append(PATH);
                 } else {
                     builder.append(SPACE);
                 }
             }
             builder.append(WALL);
             builder.append("\n");
+
+            // нарисовать середину клетки
             for (int x = 0; x < width(); x++) {
                 if (grid[y][x].westWall())  {
                     builder.append(WALL);
+                } else if (grid[y][x].partOfPath() && grid[y][x - 1].partOfPath()) {
+                    builder.append(PATH);
                 } else {
                     builder.append(SPACE);
                 }
@@ -59,25 +65,19 @@ public class MazeGrid {
                     builder.append(START);
                 } else if (grid[y][x].equals(endCell)) {
                     builder.append(END);
+                } else if (grid[y][x].partOfPath()) {
+                    builder.append(PATH);
                 } else {
                     builder.append(SPACE);
                 }
             }
-            if (grid[y][width() - 1].eastWall())  {
-                builder.append(WALL);
-            } else {
-                builder.append(SPACE);
-            }
+            builder.append(WALL);
             builder.append("\n");
         }
 
+        // нарисовать низ
         for (int x = 0; x < width(); x++) {
-            builder.append(WALL);
-            if (grid[height() - 1][x].southWall())  {
-                builder.append(WALL);
-            } else {
-                builder.append(SPACE);
-            }
+            builder.append(WALL).append(WALL);
         }
         builder.append(WALL);
         builder.append("\n");
@@ -96,8 +96,25 @@ public class MazeGrid {
         grid[cell.y()][cell.x()] = cell;
     }
 
+    void startCell(Cell cell) {
+        cell.northWall(grid[cell.y()][cell.x()].northWall);
+        cell.southWall(grid[cell.y()][cell.x()].southWall);
+        cell.westWall(grid[cell.y()][cell.x()].westWall);
+        cell.eastWall(grid[cell.y()][cell.x()].eastWall);
+        startCell = cell;
+    }
+
+    void endCell(Cell cell) {
+        cell.northWall(grid[cell.y()][cell.x()].northWall);
+        cell.southWall(grid[cell.y()][cell.x()].southWall);
+        cell.westWall(grid[cell.y()][cell.x()].westWall);
+        cell.eastWall(grid[cell.y()][cell.x()].eastWall);
+        endCell = cell;
+    }
+
     @Getter @Setter
     static class Cell {
+        private boolean partOfPath = false;
         private boolean northWall = true;
         private boolean southWall = true;
         private boolean westWall = true;

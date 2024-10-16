@@ -73,6 +73,24 @@ public class MazeSetup {
         mazeGrid.startCell(startCell);
         mazeGrid.endCell(endCell);
 
+        String pathAlgorithmChoiceText = """
+            Выберите алгоритм поиска пути:
+
+            1. BFS
+            2. А*
+            """;
+        console.print(pathAlgorithmChoiceText);
+        @SuppressWarnings("MagicNumber")
+        int pathAlgorithmChoice = console.input(1, 2);
+
+        if (pathAlgorithmChoice == 1) {
+            PathFinderBFS pathFinder = new PathFinderBFS();
+            mazeGrid = pathFinder.find(mazeGrid);
+        } else if (pathAlgorithmChoice == 2) {
+//            MazeGeneratorKruskal mazeGenerator = new MazeGeneratorKruskal();
+//            mazeGrid = mazeGenerator.generate(mazeGrid);
+        }
+
         console.print(mazeGrid.draw());
     }
 }
