@@ -87,8 +87,8 @@ public class MazeSetup {
             PathFinderBFS pathFinder = new PathFinderBFS();
             mazeGrid = pathFinder.find(mazeGrid);
         } else if (pathAlgorithmChoice == 2) {
-//            MazeGeneratorKruskal mazeGenerator = new MazeGeneratorKruskal();
-//            mazeGrid = mazeGenerator.generate(mazeGrid);
+            PathFinderAStar pathFinder = new PathFinderAStar();
+            mazeGrid = pathFinder.find(mazeGrid);
         }
 
         console.print(mazeGrid.draw());

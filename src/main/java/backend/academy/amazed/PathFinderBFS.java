@@ -2,10 +2,10 @@ package backend.academy.amazed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Queue;
 
 public class PathFinderBFS {
 
+    // https://www.youtube.com/watch?app=desktop&v=D14YK-0MtcQ
     public MazeGrid find(MazeGrid mazeGrid) {
         MazeGrid.Cell startCell = mazeGrid.startCell();
         MazeGrid.Cell onCell = startCell;
@@ -15,7 +15,7 @@ public class PathFinderBFS {
         frontier.add(onCell);
         ArrayList<MazeGrid.Cell> explored = new ArrayList<>();
         explored.add(onCell);
-        HashMap<MazeGrid.Cell, MazeGrid.Cell> bfsPath = new HashMap<>();
+        HashMap<MazeGrid.Cell, MazeGrid.Cell> path = new HashMap<>();
 
         while (!onCell.equals(endCell)) {
             onCell = frontier.removeFirst();
@@ -40,14 +40,14 @@ public class PathFinderBFS {
                 }
                 explored.add(neighbour);
                 frontier.add(neighbour);
-                bfsPath.put(neighbour, onCell);
+                path.put(neighbour, onCell);
             }
         }
 
         while (!onCell.equals(startCell)) {
             onCell.partOfPath(true);
             mazeGrid.setCell(onCell);
-            onCell = bfsPath.get(onCell);
+            onCell = path.get(onCell);
         }
 
         onCell.partOfPath(true);
