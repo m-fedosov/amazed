@@ -34,7 +34,7 @@ public class PathFinderAStar implements PathFinder {
 
         MazeGrid.Cell onCell = open.remove().cell;
 
-        while(!onCell.equals(endCell)) {
+        while (!onCell.equals(endCell)) {
             ArrayList<MazeGrid.Cell> neighbours = new ArrayList<>();
             if (!onCell.northWall()) {
                 neighbours.add(mazeGrid.getCell(onCell.y() - 1, onCell.x()));
@@ -85,7 +85,7 @@ public class PathFinderAStar implements PathFinder {
         int g;
         MazeGrid.Cell cell;
 
-        CellGF (int f, int g, MazeGrid.Cell cell) {
+        CellGF(int f, int g, MazeGrid.Cell cell) {
             this.f = f;
             this.g = g;
             this.cell = cell;

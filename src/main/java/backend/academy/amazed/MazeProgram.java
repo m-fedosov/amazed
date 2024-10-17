@@ -1,11 +1,12 @@
 package backend.academy.amazed;
 
-public class MazeSetup {
+public class MazeProgram {
     private static final int MIN_SIZE = 4;
     private static final int MAX_SIZE = 40;
 
     private MazeGrid mazeGrid;
 
+    @SuppressWarnings("MultipleStringLiterals")
     public void run() throws Exception {
         Console console = new Console();
         printWelcomeMessage(console);
@@ -16,7 +17,11 @@ public class MazeSetup {
 
         mazeGrid = new MazeGrid(inputHandler.height(), inputHandler.width());
 
-        int algorithmChoice = inputHandler.promptForAlgorithm("Выберите алгоритм генерации лабиринта", "Алгоритм Прима", "Алгоритм Краскала");
+        int algorithmChoice = inputHandler.promptForAlgorithm(
+            "Выберите алгоритм генерации лабиринта",
+            "Алгоритм Прима",
+            "Алгоритм Краскала"
+        );
         mazeGrid = mazeManager.generateMaze(algorithmChoice, mazeGrid);
 
         MazeGrid.Cell startCell = inputHandler.promptForCell("Начало лабиринта:");
@@ -28,7 +33,11 @@ public class MazeSetup {
         mazeGrid.startCell(startCell);
         mazeGrid.endCell(endCell);
 
-        int pathAlgorithmChoice = inputHandler.promptForAlgorithm("Выберите алгоритм поиска пути", "BFS", "A*");
+        int pathAlgorithmChoice = inputHandler.promptForAlgorithm(
+            "Выберите алгоритм поиска пути",
+            "BFS",
+            "A*"
+        );
         mazeGrid = pathManager.findPath(pathAlgorithmChoice, mazeGrid);
 
         console.print(mazeGrid.draw());

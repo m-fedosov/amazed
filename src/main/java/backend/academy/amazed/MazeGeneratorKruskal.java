@@ -29,6 +29,7 @@ public class MazeGeneratorKruskal implements MazeGenerator {
     }
 
     /** Изначально каждая ячейка это путь длинной 1*/
+    @SuppressWarnings("HiddenField")
     private HashMap<Integer, ArrayList<MazeGrid.Cell>> initializePathToCells(MazeGrid mazeGrid) {
         HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells = new HashMap<>();
         for (int i = 0; i < mazeGrid.height(); i++) {

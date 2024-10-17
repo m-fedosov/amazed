@@ -1,7 +1,6 @@
 package backend.academy.amazed;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 
 public class MazeGeneratorPrim implements MazeGenerator {
@@ -21,7 +20,9 @@ public class MazeGeneratorPrim implements MazeGenerator {
         initializeMaze();
 
         Random random = new Random();
-        MazeGrid.Cell randomStart = new MazeGrid.Cell(VISITED, random.nextInt(mazeGrid.height()), random.nextInt(mazeGrid.width()));
+        MazeGrid.Cell randomStart = new MazeGrid.Cell(
+            VISITED, random.nextInt(mazeGrid.height()), random.nextInt(mazeGrid.width())
+        );
         ArrayList<MazeGrid.Cell> neighbors = new ArrayList<>();
         neighbors.add(randomStart);
 

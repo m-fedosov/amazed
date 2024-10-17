@@ -84,9 +84,15 @@ public class MazeGrid {
 
     /** Возвращает символ для отображения клетки */
     private String getCellDisplay(Cell cell) {
-        if (cell.equals(startCell)) return START;
-        if (cell.equals(endCell)) return END;
-        if (cell.partOfPath()) return PATH;
+        if (cell.equals(startCell)) {
+            return START;
+        }
+        if (cell.equals(endCell)) {
+            return END;
+        }
+        if (cell.partOfPath()) {
+            return PATH;
+        }
         return SPACE;
     }
 
@@ -146,9 +152,14 @@ public class MazeGrid {
         }
 
         @Override
+        @SuppressWarnings("EqualsHashCode")
         public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
             Cell cell = (Cell) obj;
             return x == cell.x && y == cell.y;
         }
