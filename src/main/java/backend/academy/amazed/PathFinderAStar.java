@@ -35,19 +35,7 @@ public class PathFinderAStar implements PathFinder {
         MazeGrid.Cell onCell = open.remove().cell;
 
         while (!onCell.equals(endCell)) {
-            ArrayList<MazeGrid.Cell> neighbours = new ArrayList<>();
-            if (!onCell.northWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y() - 1, onCell.x()));
-            }
-            if (!onCell.southWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y() + 1, onCell.x()));
-            }
-            if (!onCell.westWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y(), onCell.x() - 1));
-            }
-            if (!onCell.eastWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y(), onCell.x() + 1));
-            }
+            ArrayList<MazeGrid.Cell> neighbours = getNeighbours(mazeGrid, onCell);
 
             for (MazeGrid.Cell neighbour : neighbours) {
                 int tempGScore = gScore.get(onCell) + 1;

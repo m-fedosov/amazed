@@ -20,19 +20,7 @@ public class PathFinderBFS implements PathFinder {
         while (!onCell.equals(endCell)) {
             onCell = frontier.removeFirst();
 
-            ArrayList<MazeGrid.Cell> neighbours = new ArrayList<>();
-            if (!onCell.northWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y() - 1, onCell.x()));
-            }
-            if (!onCell.southWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y() + 1, onCell.x()));
-            }
-            if (!onCell.westWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y(), onCell.x() - 1));
-            }
-            if (!onCell.eastWall()) {
-                neighbours.add(mazeGrid.getCell(onCell.y(), onCell.x() + 1));
-            }
+            ArrayList<MazeGrid.Cell> neighbours = getNeighbours(mazeGrid, onCell);
 
             for (MazeGrid.Cell neighbour : neighbours) {
                 if (explored.contains(neighbour)) {
