@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class MazeGeneratorPrim {
+public class MazeGeneratorPrim implements MazeGenerator {
     MazeGrid mazeGrid;
 
     private void makeConnection(MazeGrid.Cell first, MazeGrid.Cell second) {

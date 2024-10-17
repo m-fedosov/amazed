@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class MazeGeneratorKruskal {
+public class MazeGeneratorKruskal implements MazeGenerator {
     MazeGrid mazeGrid;
     HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells;
 

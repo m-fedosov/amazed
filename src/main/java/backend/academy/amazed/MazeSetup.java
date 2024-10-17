@@ -3,18 +3,48 @@ package backend.academy.amazed;
 import lombok.Getter;
 
 public class MazeSetup {
-    int width;
-    int height;
+    private static final int MIN_SIZE = 4;
+    private static final int MAX_SIZE = 40;
+    private static final int PRIM_ALGORITHM = 1;
+    private static final int KRUSKAL_ALGORITHM = 2;
+    private static final int BFS_ALGORITHM = 1;
+    private static final int A_STAR_ALGORITHM = 2;
+
+    private int width;
+    private int height;
+
     @Getter
-    MazeGrid mazeGrid;
+    private MazeGrid mazeGrid;
 
-    @SuppressWarnings("MagicNumber")
-    int minSize = 4;
-    @SuppressWarnings("MagicNumber")
-    int maxSize = 40;
-
-    public void setUp() {
+    public void setUp() throws Exception {
         Console console = new Console();
+        printWelcomeMessage(console);
+
+        height = promptForDimension(console, "Высота генерируемого лабиринта");
+        width = promptForDimension(console, "Ширина генерируемого лабиринта");
+        mazeGrid = new MazeGrid(height, width);
+
+        int algorithmChoice = promptForAlgorithm(console, "Выберите алгоритм генерации лабиринта:", "Алгоритм Прима", "Алгоритм Краскала");
+        generateMaze(algorithmChoice);
+
+        MazeGrid.Cell startCell = promptForCell(console, "Начало лабиринта:");
+        MazeGrid.Cell endCell = promptForCell(console, "Конец лабиринта:");
+
+        while (startCell.equals(endCell)) {
+            console.print("Начальная и конечная точки совпадают. Пожалуйста, выберите другие координаты для конца лабиринта.");
+            endCell = promptForCell(console, "Конец лабиринта:");
+        }
+
+        mazeGrid.startCell(startCell);
+        mazeGrid.endCell(endCell);
+
+        int pathAlgorithmChoice = promptForAlgorithm(console, "Выберите алгоритм поиска пути:", "BFS", "A*");
+        findPath(pathAlgorithmChoice);
+
+        console.print(mazeGrid.draw());
+    }
+
+    private void printWelcomeMessage(Console console) {
         String welcomeText = """
             Добро пожаловать!
             Это консольная программа для генерации лабиринтов и поиска пути в них.
@@ -25,72 +55,46 @@ public class MazeSetup {
             Для генерации лабиринта нужно ввести следующие параметры.
             """;
         console.print(welcomeText);
+    }
 
-        console.print("Ширина генерируемого лабиринта");
-        width = console.input(minSize, maxSize);
-        console.print("Высота генерируемого лабиринта");
-        height = console.input(minSize, maxSize);
-        mazeGrid = new MazeGrid(height, width);
+    private int promptForDimension(Console console, String prompt) {
+        console.print(prompt);
+        return console.input(MIN_SIZE, MAX_SIZE);
+    }
 
-        String algorithmChoiceText = """
-            Выберите алгоритм генерации лабиринта:
+    private int promptForAlgorithm(Console console, String prompt, String firstOption, String secondOption) {
+        String algorithmChoiceText = String.format("""
+            %s
 
-            1. Алгоритм Прима
-            2. Алгоритм Краскала
-            """;
+            1. %s
+            2. %s
+            """, prompt, firstOption, secondOption);
         console.print(algorithmChoiceText);
-        @SuppressWarnings("MagicNumber")
-        int algorithmChoice = console.input(1, 2);
+        return console.input(1, 2);
+    }
 
-        if (algorithmChoice == 1) {
-            MazeGeneratorPrim mazeGenerator = new MazeGeneratorPrim();
-            mazeGrid = mazeGenerator.generate(mazeGrid);
-        } else if (algorithmChoice == 2) {
-            MazeGeneratorKruskal mazeGenerator = new MazeGeneratorKruskal();
-            mazeGrid = mazeGenerator.generate(mazeGrid);
-        }
+    private MazeGrid.Cell promptForCell(Console console, String prompt) {
+        console.print(prompt);
+        int y = console.input(0, height - 1);
+        int x = console.input(0, width - 1);
+        return new MazeGrid.Cell(0, y, x);
+    }
 
-        console.print("Начало лабиринта:");
-        int y1 = console.input(0, height - 1);
-        int x1 = console.input(0, width - 1);
-        MazeGrid.Cell startCell = new MazeGrid.Cell(0, y1, x1);
+    private void generateMaze(int algorithmChoice) throws Exception {
+        MazeGenerator generator = switch (algorithmChoice) {
+            case PRIM_ALGORITHM -> new MazeGeneratorPrim();
+            case KRUSKAL_ALGORITHM -> new MazeGeneratorKruskal();
+            default -> throw new Exception("Заданы неправильные константы в алгоритмах генерации лабиринта");
+        };
+        mazeGrid = generator.generate(mazeGrid);
+    }
 
-        console.print("Конец лабиринта:");
-        int y2 = console.input(0, height - 1);
-        int x2 = console.input(0, width - 1);
-        MazeGrid.Cell endCell = new MazeGrid.Cell(0, y2, x2);
-
-        // Проверка на совпадение начальной и конечной точек
-        while (startCell.equals(endCell)) {
-            console.print(
-                "Начальная и конечная точки совпадают. Пожалуйста, выберите другие координаты для конца лабиринта."
-            );
-            x2 = console.input(0, width - 1);
-            y2 = console.input(0, height - 1);
-            endCell = new MazeGrid.Cell(0, y2, x2);
-        }
-
-        mazeGrid.startCell(startCell);
-        mazeGrid.endCell(endCell);
-
-        String pathAlgorithmChoiceText = """
-            Выберите алгоритм поиска пути:
-
-            1. BFS
-            2. А*
-            """;
-        console.print(pathAlgorithmChoiceText);
-        @SuppressWarnings("MagicNumber")
-        int pathAlgorithmChoice = console.input(1, 2);
-
-        if (pathAlgorithmChoice == 1) {
-            PathFinderBFS pathFinder = new PathFinderBFS();
-            mazeGrid = pathFinder.find(mazeGrid);
-        } else if (pathAlgorithmChoice == 2) {
-            PathFinderAStar pathFinder = new PathFinderAStar();
-            mazeGrid = pathFinder.find(mazeGrid);
-        }
-
-        console.print(mazeGrid.draw());
+    private void findPath(int pathAlgorithmChoice) throws Exception {
+        PathFinder pathFinder = switch (pathAlgorithmChoice) {
+            case BFS_ALGORITHM -> new PathFinderBFS();
+            case A_STAR_ALGORITHM -> new PathFinderAStar();
+            default -> throw new Exception("Заданы неправильные константы в алгоритмах поиска пути");
+        };
+        mazeGrid = pathFinder.find(mazeGrid);
     }
 }

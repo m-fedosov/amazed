@@ -3,7 +3,7 @@ package backend.academy.amazed;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PathFinderBFS {
+public class PathFinderBFS implements PathFinder {
 
     // https://www.youtube.com/watch?app=desktop&v=D14YK-0MtcQ
     public MazeGrid find(MazeGrid mazeGrid) {

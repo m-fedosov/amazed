@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
-public class PathFinderAStar {
+public class PathFinderAStar implements PathFinder {
 
     private Integer h(MazeGrid.Cell cell1, MazeGrid.Cell cell2) {
         return Math.abs(cell1.x() - cell2.x()) + Math.abs(cell1.y() - cell2.y());
