@@ -6,11 +6,11 @@ import lombok.Setter;
 @Getter
 public class MazeGrid {
 
-    private final String WALL  = "⬜️";
-    private final String SPACE = "⬛️";
-    private final String START = "🟩";
-    private final String END   = "🟥";
-    private final String PATH  = "🟨";
+    private static final String WALL  = "⬜️";
+    private static final String SPACE = "⬛️";
+    private static final String START = "🟩";
+    private static final String END   = "🟥";
+    private static final String PATH  = "🟨";
 
     private Cell startCell;
     private Cell endCell;
@@ -18,12 +18,15 @@ public class MazeGrid {
     private final int height;
     private final Cell[][] grid;
 
-    // Конструктор, создающий сетку лабиринта заданного размера
     public MazeGrid(int height, int width) {
         this.height = height;
         this.width = width;
-        grid = new Cell[height][width];
+        this.grid = new Cell[height][width];
+        initializeGrid();
+    }
 
+    // Инициализация сетки лабиринта
+    private void initializeGrid() {
         int cnt = 0;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -32,61 +35,71 @@ public class MazeGrid {
         }
     }
 
-    // Метод для построения строки с отображением лабиринта
+    // Метод для отображения лабиринта
     public String draw() {
         StringBuilder builder = new StringBuilder();
 
-        // Проходим по каждой клетке
-        for (int y = 0; y < height(); y++) {
-            // нарисовать северную границу клетки
-            for (int x = 0; x < width(); x++) {
-                builder.append(WALL);
-                if (grid[y][x].northWall())  {
-                    builder.append(WALL);
-                } else if (grid[y][x].partOfPath() && grid[y - 1][x].partOfPath()) {
-                    builder.append(PATH);
-                } else {
-                    builder.append(SPACE);
-                }
-            }
-            builder.append(WALL);
-            builder.append("\n");
-
-            // нарисовать середину клетки
-            for (int x = 0; x < width(); x++) {
-                if (grid[y][x].westWall())  {
-                    builder.append(WALL);
-                } else if (grid[y][x].partOfPath() && grid[y][x - 1].partOfPath()) {
-                    builder.append(PATH);
-                } else {
-                    builder.append(SPACE);
-                }
-                if (grid[y][x].equals(startCell)) {
-                    builder.append(START);
-                } else if (grid[y][x].equals(endCell)) {
-                    builder.append(END);
-                } else if (grid[y][x].partOfPath()) {
-                    builder.append(PATH);
-                } else {
-                    builder.append(SPACE);
-                }
-            }
-            builder.append(WALL);
-            builder.append("\n");
+        for (int y = 0; y < height; y++) {
+            builder.append(drawNorthWalls(y));
+            builder.append(drawCellContent(y));
         }
 
-        // нарисовать низ
-        for (int x = 0; x < width(); x++) {
-            builder.append(WALL).append(WALL);
-        }
-        builder.append(WALL);
-        builder.append("\n");
-
+        builder.append(drawBottomWall());
         return builder.toString();
     }
 
+    // Отображение северных стен клеток
+    private String drawNorthWalls(int y) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int x = 0; x < width; x++) {
+            builder.append(WALL);
+            builder.append(grid[y][x].northWall() ? WALL : getCellSymbol(grid[y - 1][x], grid[y][x], Direction.NORTH));
+        }
+        builder.append(WALL).append("\n");
+        return builder.toString();
+    }
+
+    // Отображение содержимого клеток
+    private String drawCellContent(int y) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int x = 0; x < width; x++) {
+            builder.append(grid[y][x].westWall() ? WALL : getCellSymbol(grid[y][x - 1], grid[y][x], Direction.WEST));
+            builder.append(getCellDisplay(grid[y][x]));
+        }
+        builder.append(WALL).append("\n");
+        return builder.toString();
+    }
+
+    // Отображение нижней стены
+    private String drawBottomWall() {
+        StringBuilder builder = new StringBuilder();
+        for (int x = 0; x < width; x++) {
+            builder.append(WALL).append(WALL);
+        }
+        builder.append(WALL).append("\n");
+        return builder.toString();
+    }
+
+    // Возвращает символ для отображения клетки
+    private String getCellDisplay(Cell cell) {
+        if (cell.equals(startCell)) return START;
+        if (cell.equals(endCell)) return END;
+        if (cell.partOfPath()) return PATH;
+        return SPACE;
+    }
+
+    // Определяет символ для отображения связи между клетками
+    private String getCellSymbol(Cell prevCell, Cell currentCell, Direction direction) {
+        if (prevCell != null && prevCell.partOfPath() && currentCell.partOfPath()) {
+            return PATH;
+        }
+        return SPACE;
+    }
+
     Cell getCell(int y, int x) {
-        if (y < 0 || y >= height() || x < 0 || x >= width()) {
+        if (y < 0 || y >= height || x < 0 || x >= width) {
             return null;
         }
         return grid[y][x];
@@ -97,19 +110,21 @@ public class MazeGrid {
     }
 
     void startCell(Cell cell) {
-        cell.northWall(grid[cell.y()][cell.x()].northWall);
-        cell.southWall(grid[cell.y()][cell.x()].southWall);
-        cell.westWall(grid[cell.y()][cell.x()].westWall);
-        cell.eastWall(grid[cell.y()][cell.x()].eastWall);
+        copyWalls(grid[cell.y()][cell.x()], cell);
         startCell = cell;
     }
 
     void endCell(Cell cell) {
-        cell.northWall(grid[cell.y()][cell.x()].northWall);
-        cell.southWall(grid[cell.y()][cell.x()].southWall);
-        cell.westWall(grid[cell.y()][cell.x()].westWall);
-        cell.eastWall(grid[cell.y()][cell.x()].eastWall);
+        copyWalls(grid[cell.y()][cell.x()], cell);
         endCell = cell;
+    }
+
+    // Копирование стен из одной клетки в другую
+    private void copyWalls(Cell source, Cell target) {
+        target.northWall(source.northWall());
+        target.southWall(source.southWall());
+        target.westWall(source.westWall());
+        target.eastWall(source.eastWall());
     }
 
     @Getter @Setter
@@ -130,17 +145,17 @@ public class MazeGrid {
             this.x = x;
         }
 
-        @SuppressWarnings("EqualsHashCode")
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
             Cell cell = (Cell) obj;
             return x == cell.x && y == cell.y;
         }
+    }
+
+    // Перечисление для направлений
+    private enum Direction {
+        NORTH, WEST
     }
 }
