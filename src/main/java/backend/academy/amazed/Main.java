@@ -6,6 +6,6 @@ import lombok.experimental.UtilityClass;
 public class Main {
     public static void main(String[] args) throws Exception {
         MazeSetup mazeSetup = new MazeSetup();
-        mazeSetup.setUp();
+        mazeSetup.run();
     }
 }
