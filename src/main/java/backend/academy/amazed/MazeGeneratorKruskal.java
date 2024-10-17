@@ -6,26 +6,26 @@ import java.util.HashMap;
 
 public class MazeGeneratorKruskal implements MazeGenerator {
     MazeGrid mazeGrid;
+    /** Путь и ячейки в нём */
     HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells;
 
-    MazeGrid.Cell northCell;
-    MazeGrid.Cell southCell;
-    MazeGrid.Cell westCell;
-    MazeGrid.Cell eastCell;
-
-    private HashMap<Integer, ArrayList<MazeGrid.Cell>> getPathToCells(MazeGrid mazeGrid) {
+    /** Изначально каждая точка это путь длинной 1*/
+    private HashMap<Integer, ArrayList<MazeGrid.Cell>> initializePathToCells(MazeGrid mazeGrid) {
         HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells = new HashMap<>();
         for (int i = 0; i < mazeGrid.height(); i++) {
             for (int j = 0; j < mazeGrid.width(); j++) {
+                MazeGrid.Cell cell = mazeGrid.getCell(i, j);
                 ArrayList<MazeGrid.Cell> pathToCellsList = new ArrayList<>();
-                MazeGrid.Cell onCell = mazeGrid.getCell(i, j);
-                pathToCellsList.add(onCell);
-                pathToCells.put(onCell.type(), pathToCellsList);
+                pathToCellsList.add(cell);
+                pathToCells.put(cell.type(), pathToCellsList);
             }
         }
         return pathToCells;
     }
 
+    /** Чтобы текучесь лабиринта была выше,
+     * стоит объединять самые короткие отрезки пути,
+     * пока они не образуют один путь */
     private ArrayList<MazeGrid.Cell> getCellsWhereMinPathLength() {
         ArrayList<Integer> keys = new ArrayList<>(pathToCells.keySet());
         Collections.shuffle(keys);
@@ -41,75 +41,76 @@ public class MazeGeneratorKruskal implements MazeGenerator {
         throw new RuntimeException("No cells with min path length");
     }
 
-    private MazeGrid.Cell getRandomCellToMerge(MazeGrid.Cell onCell, MazeGrid mazeGrid) {
-        northCell = mazeGrid.getCell(onCell.y() - 1, onCell.x());
-        southCell = mazeGrid.getCell(onCell.y() + 1, onCell.x());
-        westCell  = mazeGrid.getCell(onCell.y(), onCell.x() - 1);
-        eastCell  = mazeGrid.getCell(onCell.y(), onCell.x() + 1);
-
-        var canMergeWithCell = new ArrayList<MazeGrid.Cell>();
-        if (northCell != null && northCell.type != onCell.type) {
-            canMergeWithCell.add(northCell);
+    /** Ячейку лабиринта можно объединить с другой ячейкой, если они не являются частью одного пути */
+    private MazeGrid.Cell findMergeableNeighbor(MazeGrid.Cell cell) {
+        ArrayList<MazeGrid.Cell> neighbors = findNeighbors(cell);
+        Collections.shuffle(neighbors);
+        for (MazeGrid.Cell neighbor : neighbors) {
+            if (neighbor.type() != cell.type()) {
+                return neighbor;
+            }
         }
-        if (southCell != null && southCell.type != onCell.type) {
-            canMergeWithCell.add(southCell);
-        }
-        if (eastCell != null && eastCell.type != onCell.type ) {
-            canMergeWithCell.add(eastCell);
-        }
-        if (westCell != null && westCell.type != onCell.type) {
-            canMergeWithCell.add(westCell);
-        }
-
-        if (canMergeWithCell.isEmpty()) {
-            return null;
-        }
-
-        Collections.shuffle(canMergeWithCell);
-        return canMergeWithCell.getFirst();
+        return null;
     }
 
-    private void mergeCellWithOther(MazeGrid.Cell onCell, MazeGrid.Cell cellToMergeWith) {
-        int cellToMergeWithType = cellToMergeWith.type;
+    private ArrayList<MazeGrid.Cell> findNeighbors(MazeGrid.Cell cell) {
+        ArrayList<MazeGrid.Cell> neighbors = new ArrayList<>();
+        addNeighborIfValid(neighbors, mazeGrid.getCell(cell.y() - 1, cell.x()));  // north
+        addNeighborIfValid(neighbors, mazeGrid.getCell(cell.y() + 1, cell.x()));  // south
+        addNeighborIfValid(neighbors, mazeGrid.getCell(cell.y(), cell.x() - 1));  // west
+        addNeighborIfValid(neighbors, mazeGrid.getCell(cell.y(), cell.x() + 1));  // east
+        return neighbors;
+    }
+
+    private void addNeighborIfValid(ArrayList<MazeGrid.Cell> neighbors, MazeGrid.Cell neighbor) {
+        if (neighbor != null) {
+            neighbors.add(neighbor);
+        }
+    }
+
+    /** Объединять можно только ячейки, которые не являются частью того же пути */
+    private void mergeCells(MazeGrid.Cell fromCell, MazeGrid.Cell toCell) {
+        int cellToMergeWithType = toCell.type;
         for (MazeGrid.Cell c : pathToCells.get(cellToMergeWithType)) {
-            c.type(onCell.type);
+            c.type(fromCell.type);
             mazeGrid.setCell(c);
-            pathToCells.get(onCell.type).add(c);
+            pathToCells.get(fromCell.type).add(c);
         }
         pathToCells.remove(cellToMergeWithType);
-
-        if (cellToMergeWith.y() > onCell.y()) { // south cell
-            onCell.southWall(false);
-            mazeGrid.setCell(onCell);
-            cellToMergeWith.northWall(false);
-            mazeGrid.setCell(cellToMergeWith);
-        } else if (cellToMergeWith.y() < onCell.y()) { // north cell
-            onCell.northWall(false);
-            mazeGrid.setCell(onCell);
-            cellToMergeWith.southWall(false);
-            mazeGrid.setCell(cellToMergeWith);
-        } else if (cellToMergeWith.x() < onCell.x()) { // west cell
-            onCell.westWall(false);
-            mazeGrid.setCell(onCell);
-            cellToMergeWith.eastWall(false);
-            mazeGrid.setCell(cellToMergeWith);
-        } else if (cellToMergeWith.x() > onCell.x()) { // east cell
-            onCell.eastWall(false);
-            mazeGrid.setCell(onCell);
-            cellToMergeWith.westWall(false);
-            mazeGrid.setCell(cellToMergeWith);
-        }
+        updateWalls(fromCell, toCell);
     }
 
+    /** Каждая ячейка содержит в себе стены */
+    private void updateWalls(MazeGrid.Cell fromCell, MazeGrid.Cell toCell) {
+        if (toCell.y() > fromCell.y()) {
+            fromCell.southWall(false);
+            toCell.northWall(false);
+        } else if (toCell.y() < fromCell.y()) {
+            fromCell.northWall(false);
+            toCell.southWall(false);
+        } else if (toCell.x() < fromCell.x()) {
+            fromCell.westWall(false);
+            toCell.eastWall(false);
+        } else if (toCell.x() > fromCell.x()) {
+            fromCell.eastWall(false);
+            toCell.westWall(false);
+        }
+        mazeGrid.setCell(fromCell);
+        mazeGrid.setCell(toCell);
+    }
+
+    /** Использовал алгоритм Краскала из
+     * <a href="https://weblog.jamisbuck.org/2011/1/3/maze-generation-kruskal-s-algorithm.html">этой статьи'</a>
+     */
     public MazeGrid generate(MazeGrid mazeGrid) {
         this.mazeGrid = mazeGrid;
-        pathToCells = getPathToCells(mazeGrid);
+        pathToCells = initializePathToCells(mazeGrid);
         while (pathToCells.keySet().size() != 1) {
             var mergeOneOfCells = getCellsWhereMinPathLength();
             for (MazeGrid.Cell c : mergeOneOfCells) {
-                MazeGrid.Cell cellToMergeWith = getRandomCellToMerge(c, mazeGrid);
+                MazeGrid.Cell cellToMergeWith = findMergeableNeighbor(c);
                 if (cellToMergeWith != null) {
-                    mergeCellWithOther(c, cellToMergeWith);
+                    mergeCells(c, cellToMergeWith);
                     break;
                 }
             }
