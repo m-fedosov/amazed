@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class PathFinderBFS implements PathFinder {
 
-    // https://www.youtube.com/watch?app=desktop&v=D14YK-0MtcQ
+    /** Для BFS адоптировал под текущую задачу алгоритм из этого <a href="https://www.youtube.com/watch?app=desktop&v=D14YK-0MtcQ">видео'</a> */
     public MazeGrid find(MazeGrid mazeGrid) {
         MazeGrid.Cell startCell = mazeGrid.startCell();
         MazeGrid.Cell onCell = startCell;
@@ -44,12 +44,12 @@ public class PathFinderBFS implements PathFinder {
             }
         }
 
+        /** Отрисовка пути в лабиринте */
         while (!onCell.equals(startCell)) {
             onCell.partOfPath(true);
             mazeGrid.setCell(onCell);
             onCell = path.get(onCell);
         }
-
         onCell.partOfPath(true);
         mazeGrid.setCell(onCell);
 

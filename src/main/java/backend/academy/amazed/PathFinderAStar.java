@@ -6,10 +6,7 @@ import java.util.PriorityQueue;
 
 public class PathFinderAStar implements PathFinder {
 
-    private Integer h(MazeGrid.Cell cell1, MazeGrid.Cell cell2) {
-        return Math.abs(cell1.x() - cell2.x()) + Math.abs(cell1.y() - cell2.y());
-    }
-
+    /** Для A* адоптировал под текущую задачу алгоритм из этого <a href="https://youtu.be/W9zSr9jnoqY?feature=shared">видео'</a> */
     public MazeGrid find(MazeGrid mazeGrid) {
         MazeGrid.Cell startCell = mazeGrid.startCell();
         MazeGrid.Cell endCell = mazeGrid.endCell();
@@ -67,28 +64,34 @@ public class PathFinderAStar implements PathFinder {
             onCell = open.remove().cell;
         }
 
+        /** Отрисовка пути в лабиринте */
         while (!onCell.equals(startCell)) {
             onCell.partOfPath(true);
             mazeGrid.setCell(onCell);
             onCell = path.get(onCell);
         }
-
         onCell.partOfPath(true);
         mazeGrid.setCell(onCell);
 
         return mazeGrid;
     }
 
+    private Integer h(MazeGrid.Cell cell1, MazeGrid.Cell cell2) {
+        return Math.abs(cell1.x() - cell2.x()) + Math.abs(cell1.y() - cell2.y());
+    }
+
     static class CellGF implements Comparable<CellGF> {
         int f;
         int g;
         MazeGrid.Cell cell;
+
         CellGF (int f, int g, MazeGrid.Cell cell) {
             this.f = f;
             this.g = g;
             this.cell = cell;
         }
 
+        /** Интерфейс сравнения для Priority Queue */
         @Override
         public int compareTo(CellGF other) {
             return Integer.compare(this.f, other.f);

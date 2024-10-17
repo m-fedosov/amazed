@@ -9,6 +9,25 @@ public class MazeGeneratorKruskal implements MazeGenerator {
     /** Путь и ячейки в нём */
     HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells;
 
+    /** Использовал алгоритм Краскала из
+     * <a href="https://weblog.jamisbuck.org/2011/1/3/maze-generation-kruskal-s-algorithm.html">этой статьи'</a>
+     */
+    public MazeGrid generate(MazeGrid mazeGrid) {
+        this.mazeGrid = mazeGrid;
+        pathToCells = initializePathToCells(mazeGrid);
+        while (pathToCells.keySet().size() != 1) {
+            var mergeOneOfCells = getCellsWhereMinPathLength();
+            for (MazeGrid.Cell c : mergeOneOfCells) {
+                MazeGrid.Cell cellToMergeWith = findMergeableNeighbor(c);
+                if (cellToMergeWith != null) {
+                    mergeCells(c, cellToMergeWith);
+                    break;
+                }
+            }
+        }
+        return mazeGrid;
+    }
+
     /** Изначально каждая ячейка это путь длинной 1*/
     private HashMap<Integer, ArrayList<MazeGrid.Cell>> initializePathToCells(MazeGrid mazeGrid) {
         HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells = new HashMap<>();
@@ -97,24 +116,5 @@ public class MazeGeneratorKruskal implements MazeGenerator {
         }
         mazeGrid.setCell(fromCell);
         mazeGrid.setCell(toCell);
-    }
-
-    /** Использовал алгоритм Краскала из
-     * <a href="https://weblog.jamisbuck.org/2011/1/3/maze-generation-kruskal-s-algorithm.html">этой статьи'</a>
-     */
-    public MazeGrid generate(MazeGrid mazeGrid) {
-        this.mazeGrid = mazeGrid;
-        pathToCells = initializePathToCells(mazeGrid);
-        while (pathToCells.keySet().size() != 1) {
-            var mergeOneOfCells = getCellsWhereMinPathLength();
-            for (MazeGrid.Cell c : mergeOneOfCells) {
-                MazeGrid.Cell cellToMergeWith = findMergeableNeighbor(c);
-                if (cellToMergeWith != null) {
-                    mergeCells(c, cellToMergeWith);
-                    break;
-                }
-            }
-        }
-        return mazeGrid;
     }
 }

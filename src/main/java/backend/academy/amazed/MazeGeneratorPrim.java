@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.Random;
 
 public class MazeGeneratorPrim implements MazeGenerator {
+    private MazeGrid mazeGrid;
+
+    /** Типы ячеек в лабиринте */
     private static final int NOT_VISITED = 0;
     private static final int VISITED = 1;
     private static final int PATH = 2;
-
-    private MazeGrid mazeGrid;
 
     /** Использовал алгоритм Прима из
      * <a href="https://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm.html">этой статьи'</a>
