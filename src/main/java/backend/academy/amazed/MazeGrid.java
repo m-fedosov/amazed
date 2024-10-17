@@ -25,7 +25,7 @@ public class MazeGrid {
         initializeGrid();
     }
 
-    // Инициализация сетки лабиринта
+    /** Инициализация сетки лабиринта */
     private void initializeGrid() {
         int cnt = 0;
         for (int i = 0; i < height; i++) {
@@ -35,7 +35,7 @@ public class MazeGrid {
         }
     }
 
-    // Метод для отображения лабиринта
+    /** Метод для отображения лабиринта */
     public String draw() {
         StringBuilder builder = new StringBuilder();
 
@@ -48,7 +48,7 @@ public class MazeGrid {
         return builder.toString();
     }
 
-    // Отображение северных стен клеток
+    /** Отображение северных стен клеток */
     private String drawNorthWalls(int y) {
         StringBuilder builder = new StringBuilder();
 
@@ -60,7 +60,7 @@ public class MazeGrid {
         return builder.toString();
     }
 
-    // Отображение содержимого клеток
+    /** Отображение содержимого клеток */
     private String drawCellContent(int y) {
         StringBuilder builder = new StringBuilder();
 
@@ -72,7 +72,7 @@ public class MazeGrid {
         return builder.toString();
     }
 
-    // Отображение нижней стены
+    /** Отображение нижней стены */
     private String drawBottomWall() {
         StringBuilder builder = new StringBuilder();
         for (int x = 0; x < width; x++) {
@@ -82,7 +82,7 @@ public class MazeGrid {
         return builder.toString();
     }
 
-    // Возвращает символ для отображения клетки
+    /** Возвращает символ для отображения клетки */
     private String getCellDisplay(Cell cell) {
         if (cell.equals(startCell)) return START;
         if (cell.equals(endCell)) return END;
@@ -90,7 +90,7 @@ public class MazeGrid {
         return SPACE;
     }
 
-    // Определяет символ для отображения связи между клетками
+    /** Определяет символ для отображения связи между клетками */
     private String getCellSymbol(Cell prevCell, Cell currentCell, Direction direction) {
         if (prevCell != null && prevCell.partOfPath() && currentCell.partOfPath()) {
             return PATH;
@@ -119,7 +119,7 @@ public class MazeGrid {
         endCell = cell;
     }
 
-    // Копирование стен из одной клетки в другую
+    /** Копирование стен из одной клетки в другую */
     private void copyWalls(Cell source, Cell target) {
         target.northWall(source.northWall());
         target.southWall(source.southWall());
@@ -154,7 +154,7 @@ public class MazeGrid {
         }
     }
 
-    // Перечисление для направлений
+    /** Перечисление для направлений */
     private enum Direction {
         NORTH, WEST
     }

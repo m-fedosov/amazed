@@ -9,7 +9,7 @@ public class MazeGeneratorKruskal implements MazeGenerator {
     /** Путь и ячейки в нём */
     HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells;
 
-    /** Изначально каждая точка это путь длинной 1*/
+    /** Изначально каждая ячейка это путь длинной 1*/
     private HashMap<Integer, ArrayList<MazeGrid.Cell>> initializePathToCells(MazeGrid mazeGrid) {
         HashMap<Integer, ArrayList<MazeGrid.Cell>> pathToCells = new HashMap<>();
         for (int i = 0; i < mazeGrid.height(); i++) {
@@ -82,16 +82,16 @@ public class MazeGeneratorKruskal implements MazeGenerator {
 
     /** Каждая ячейка содержит в себе стены */
     private void updateWalls(MazeGrid.Cell fromCell, MazeGrid.Cell toCell) {
-        if (toCell.y() > fromCell.y()) {
+        if (toCell.y() > fromCell.y()) { // South cell
             fromCell.southWall(false);
             toCell.northWall(false);
-        } else if (toCell.y() < fromCell.y()) {
+        } else if (toCell.y() < fromCell.y()) { // North cell
             fromCell.northWall(false);
             toCell.southWall(false);
-        } else if (toCell.x() < fromCell.x()) {
+        } else if (toCell.x() < fromCell.x()) { // West cell
             fromCell.westWall(false);
             toCell.eastWall(false);
-        } else if (toCell.x() > fromCell.x()) {
+        } else if (toCell.x() > fromCell.x()) { // East cell
             fromCell.eastWall(false);
             toCell.westWall(false);
         }

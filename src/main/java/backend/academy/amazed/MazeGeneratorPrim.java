@@ -5,92 +5,97 @@ import java.util.Collections;
 import java.util.Random;
 
 public class MazeGeneratorPrim implements MazeGenerator {
-    MazeGrid mazeGrid;
+    private static final int NOT_VISITED = 0;
+    private static final int VISITED = 1;
+    private static final int PATH = 2;
 
-    private void makeConnection(MazeGrid.Cell first, MazeGrid.Cell second) {
-        if (first.y() > second.y()) { // south cell
-            first.northWall(false);
-            mazeGrid.setCell(first);
-            second.southWall(false);
-            mazeGrid.setCell(second);
-        } else if (first.y() < second.y()) { // north cell
-            first.southWall(false);
-            mazeGrid.setCell(first);
-            second.northWall(false);
-            mazeGrid.setCell(second);
-        } else if (first.x() < second.x()) { // west cell
-            first.eastWall(false);
-            mazeGrid.setCell(first);
-            second.westWall(false);
-            mazeGrid.setCell(second);
-        } else if (first.x() > second.x()) { // east cell
-            first.westWall(false);
-            mazeGrid.setCell(first);
-            second.eastWall(false);
-            mazeGrid.setCell(second);
+    private MazeGrid mazeGrid;
+
+    /** Использовал алгоритм Прима из
+     * <a href="https://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm.html">этой статьи'</a>
+     */
+    @Override
+    public MazeGrid generate(MazeGrid mazeGrid) {
+        this.mazeGrid = mazeGrid;
+        initializeMaze();
+
+        Random random = new Random();
+        MazeGrid.Cell randomStart = new MazeGrid.Cell(VISITED, random.nextInt(mazeGrid.height()), random.nextInt(mazeGrid.width()));
+        ArrayList<MazeGrid.Cell> neighbors = new ArrayList<>();
+        neighbors.add(randomStart);
+
+        while (!neighbors.isEmpty()) {
+            MazeGrid.Cell currentCell = selectRandomNeighbor(neighbors, random);
+            mazeGrid.setCell(currentCell.type(2));
+
+            ArrayList<MazeGrid.Cell> connectableCells = getConnectableCells(currentCell);
+            if (!connectableCells.isEmpty()) {
+                MazeGrid.Cell connectedCell = selectRandomNeighbor(connectableCells, random);
+                connectCells(connectedCell, currentCell);
+            }
+
+            addValidNeighbors(currentCell, neighbors);
+        }
+
+        return mazeGrid;
+    }
+
+    /** Изначально каждая ячейка помечается индексом 0 - не посещена*/
+    private void initializeMaze() {
+        for (int i = 0; i < mazeGrid.height(); i++) {
+            for (int j = 0; j < mazeGrid.width(); j++) {
+                mazeGrid.setCell(mazeGrid.getCell(i, j).type(NOT_VISITED));
+            }
         }
     }
 
-    public MazeGrid generate(MazeGrid mazeGrid) {
-        this.mazeGrid = mazeGrid;
-        for (int i = 0; i < mazeGrid.height(); i++) {
-            for (int j = 0; j < mazeGrid.width(); j++) {
-                mazeGrid.setCell(mazeGrid.getCell(i, j).type(0));
+    private MazeGrid.Cell selectRandomNeighbor(ArrayList<MazeGrid.Cell> cells, Random random) {
+        return cells.remove(random.nextInt(cells.size()));
+    }
+
+    /** Ячейку типа ПУТЬ можно присоеднить только к другой ячейке типа ПУТЬ */
+    private ArrayList<MazeGrid.Cell> getConnectableCells(MazeGrid.Cell cell) {
+        ArrayList<MazeGrid.Cell> connectableCells = new ArrayList<>();
+        addIfValidAndType(connectableCells, mazeGrid.getCell(cell.y() - 1, cell.x()), PATH); // North
+        addIfValidAndType(connectableCells, mazeGrid.getCell(cell.y() + 1, cell.x()), PATH); // South
+        addIfValidAndType(connectableCells, mazeGrid.getCell(cell.y(), cell.x() - 1), PATH); // West
+        addIfValidAndType(connectableCells, mazeGrid.getCell(cell.y(), cell.x() + 1), PATH); // East
+        return connectableCells;
+    }
+
+    /** Посещаем ячейки которые мы ещё не посетили */
+    private void addValidNeighbors(MazeGrid.Cell cell, ArrayList<MazeGrid.Cell> neighbors) {
+        addIfValidAndType(neighbors, mazeGrid.getCell(cell.y() - 1, cell.x()), NOT_VISITED); // North
+        addIfValidAndType(neighbors, mazeGrid.getCell(cell.y() + 1, cell.x()), NOT_VISITED); // South
+        addIfValidAndType(neighbors, mazeGrid.getCell(cell.y(), cell.x() - 1), NOT_VISITED); // West
+        addIfValidAndType(neighbors, mazeGrid.getCell(cell.y(), cell.x() + 1), NOT_VISITED); // East
+    }
+
+    private void addIfValidAndType(ArrayList<MazeGrid.Cell> list, MazeGrid.Cell cell, int type) {
+        if (cell != null && cell.type() == type) {
+            list.add(cell);
+            if (type == NOT_VISITED) {
+                cell.type(VISITED);
             }
         }
+    }
 
-
-        Random r = new Random();
-        MazeGrid.Cell randomStart = new MazeGrid.Cell(1, r.nextInt(mazeGrid.height()), r.nextInt(mazeGrid.width()));
-        ArrayList<MazeGrid.Cell> neighbours = new ArrayList<>();
-        neighbours.add(randomStart);
-        while (!neighbours.isEmpty()) {
-            MazeGrid.Cell randomNeighbour = neighbours.remove(r.nextInt(neighbours.size()));
-            mazeGrid.setCell(randomNeighbour.type(2));
-
-            MazeGrid.Cell pathNorth = mazeGrid.getCell(randomNeighbour.y() - 1, (randomNeighbour.x()));
-            MazeGrid.Cell pathSouth = mazeGrid.getCell(randomNeighbour.y() + 1, (randomNeighbour.x()));
-            MazeGrid.Cell pathWest  = mazeGrid.getCell(randomNeighbour.y(), (randomNeighbour.x() - 1));
-            MazeGrid.Cell pathEast  = mazeGrid.getCell(randomNeighbour.y(), (randomNeighbour.x() + 1));
-
-            ArrayList<MazeGrid.Cell> connectPathTo = new ArrayList<>();
-            if (pathNorth != null && pathNorth.type == 2) {
-                connectPathTo.add(pathNorth);
-            }
-            if (pathSouth != null && pathSouth.type == 2) {
-                connectPathTo.add(pathSouth);
-            }
-            if (pathWest != null && pathWest.type == 2) {
-                connectPathTo.add(pathWest);
-            }
-            if (pathEast != null && pathEast.type == 2) {
-                connectPathTo.add(pathEast);
-            }
-
-            if (!connectPathTo.isEmpty()) {
-                Collections.shuffle(connectPathTo);
-                MazeGrid.Cell pathTo = connectPathTo.getFirst();
-                makeConnection(pathTo, randomNeighbour);
-            }
-
-            if (pathNorth != null && pathNorth.type == 0) {
-                pathNorth.type(1);
-                neighbours.add(pathNorth);
-            }
-            if (pathSouth != null && pathSouth.type == 0) {
-                pathSouth.type(1);
-                neighbours.add(pathSouth);
-            }
-            if (pathWest != null && pathWest.type == 0) {
-                pathWest.type(1);
-                neighbours.add(pathWest);
-            }
-            if (pathEast != null && pathEast.type == 0) {
-                pathEast.type(1);
-                neighbours.add(pathEast);
-            }
+    /** Каждая ячейка содержит в себе стены */
+    private void connectCells(MazeGrid.Cell first, MazeGrid.Cell second) {
+        if (first.y() > second.y()) { // South cell
+            first.northWall(false);
+            second.southWall(false);
+        } else if (first.y() < second.y()) { // North cell
+            first.southWall(false);
+            second.northWall(false);
+        } else if (first.x() < second.x()) { // West cell
+            first.eastWall(false);
+            second.westWall(false);
+        } else if (first.x() > second.x()) { // East cell
+            first.westWall(false);
+            second.eastWall(false);
         }
-
-        return this.mazeGrid;
+        mazeGrid.setCell(first);
+        mazeGrid.setCell(second);
     }
 }
