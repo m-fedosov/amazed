@@ -5,13 +5,6 @@ import lombok.Setter;
 
 @Getter
 public class MazeGrid {
-
-    private static final String WALL  = "⬜️";
-    private static final String SPACE = "⬛️";
-    private static final String START = "🟩";
-    private static final String END   = "🟥";
-    private static final String PATH  = "🟨";
-
     private Cell startCell;
     private Cell endCell;
     private final int width;
@@ -53,10 +46,10 @@ public class MazeGrid {
         StringBuilder builder = new StringBuilder();
 
         for (int x = 0; x < width; x++) {
-            builder.append(WALL);
-            builder.append(grid[y][x].northWall() ? WALL : getCellSymbol(grid[y - 1][x], grid[y][x], Direction.NORTH));
+            builder.append(Symbol.WALL.symbol());
+            builder.append(grid[y][x].northWall() ? Symbol.WALL.symbol() : getCellSymbol(grid[y - 1][x], grid[y][x], Direction.NORTH));
         }
-        builder.append(WALL).append("\n");
+        builder.append(Symbol.WALL.symbol()).append("\n");
         return builder.toString();
     }
 
@@ -65,10 +58,10 @@ public class MazeGrid {
         StringBuilder builder = new StringBuilder();
 
         for (int x = 0; x < width; x++) {
-            builder.append(grid[y][x].westWall() ? WALL : getCellSymbol(grid[y][x - 1], grid[y][x], Direction.WEST));
+            builder.append(grid[y][x].westWall() ? Symbol.WALL.symbol() : getCellSymbol(grid[y][x - 1], grid[y][x], Direction.WEST));
             builder.append(getCellDisplay(grid[y][x]));
         }
-        builder.append(WALL).append("\n");
+        builder.append(Symbol.WALL.symbol()).append("\n");
         return builder.toString();
     }
 
@@ -76,32 +69,32 @@ public class MazeGrid {
     private String drawBottomWall() {
         StringBuilder builder = new StringBuilder();
         for (int x = 0; x < width; x++) {
-            builder.append(WALL).append(WALL);
+            builder.append(Symbol.WALL.symbol()).append(Symbol.WALL.symbol());
         }
-        builder.append(WALL).append("\n");
+        builder.append(Symbol.WALL.symbol()).append("\n");
         return builder.toString();
     }
 
     /** Возвращает символ для отображения клетки */
     private String getCellDisplay(Cell cell) {
         if (cell.equals(startCell)) {
-            return START;
+            return Symbol.START.symbol();
         }
         if (cell.equals(endCell)) {
-            return END;
+            return Symbol.END.symbol();
         }
         if (cell.partOfPath()) {
-            return PATH;
+            return Symbol.PATH.symbol();
         }
-        return SPACE;
+        return Symbol.SPACE.symbol();
     }
 
     /** Определяет символ для отображения связи между клетками */
     private String getCellSymbol(Cell prevCell, Cell currentCell, Direction direction) {
         if (prevCell != null && prevCell.partOfPath() && currentCell.partOfPath()) {
-            return PATH;
+            return Symbol.PATH.symbol();
         }
-        return SPACE;
+        return Symbol.SPACE.symbol();
     }
 
     public Cell getCell(int y, int x) {
@@ -168,5 +161,21 @@ public class MazeGrid {
     /** Перечисление для направлений */
     private enum Direction {
         NORTH, WEST
+    }
+
+    /** Каждая клетка лабиринта состоит из 9 частей */
+    @Getter
+    private enum Symbol {
+        WALL("⬜️"),
+        SPACE("⬛️"),
+        START("🟩"),
+        END("🟥"),
+        PATH("🟨");
+
+        private final String symbol;
+
+        Symbol(String symbol) {
+            this.symbol = symbol;
+        }
     }
 }
