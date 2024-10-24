@@ -1,7 +1,6 @@
 package backend.academy.amazed.pathfinder;
 
 import backend.academy.amazed.skeleton.MazeGrid;
-
 import java.util.ArrayList;
 
 public interface PathFinder {
