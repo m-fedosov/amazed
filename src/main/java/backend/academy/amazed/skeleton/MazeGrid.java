@@ -108,12 +108,12 @@ public class MazeGrid {
         grid[cell.y()][cell.x()] = cell;
     }
 
-    void startCell(Cell cell) {
+    public void startCell(Cell cell) {
         copyWalls(grid[cell.y()][cell.x()], cell);
         startCell = cell;
     }
 
-    void endCell(Cell cell) {
+    public void endCell(Cell cell) {
         copyWalls(grid[cell.y()][cell.x()], cell);
         endCell = cell;
     }
