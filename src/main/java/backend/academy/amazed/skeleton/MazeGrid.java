@@ -1,4 +1,4 @@
-package backend.academy.amazed;
+package backend.academy.amazed.skeleton;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -104,14 +104,14 @@ public class MazeGrid {
         return SPACE;
     }
 
-    Cell getCell(int y, int x) {
+    public Cell getCell(int y, int x) {
         if (y < 0 || y >= height || x < 0 || x >= width) {
             return null;
         }
         return grid[y][x];
     }
 
-    void setCell(Cell cell) {
+    public void setCell(Cell cell) {
         grid[cell.y()][cell.x()] = cell;
     }
 
@@ -134,18 +134,18 @@ public class MazeGrid {
     }
 
     @Getter @Setter
-    static class Cell {
+    public static class Cell {
         private boolean partOfPath = false;
         private boolean northWall = true;
         private boolean southWall = true;
         private boolean westWall = true;
         private boolean eastWall = true;
 
-        int type;
+        public int type;
         int y;
         int x;
 
-        Cell(int type, int y, int x) {
+        public Cell(int type, int y, int x) {
             this.type = type;
             this.y = y;
             this.x = x;

@@ -1,4 +1,4 @@
-package backend.academy.amazed;
+package backend.academy.amazed.skeleton;
 
 import java.util.Scanner;
 

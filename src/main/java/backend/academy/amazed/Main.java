@@ -1,5 +1,6 @@
 package backend.academy.amazed;
 
+import backend.academy.amazed.skeleton.MazeProgram;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

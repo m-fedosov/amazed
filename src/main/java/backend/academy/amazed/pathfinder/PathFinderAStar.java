@@ -1,4 +1,6 @@
-package backend.academy.amazed;
+package backend.academy.amazed.pathfinder;
+
+import backend.academy.amazed.skeleton.MazeGrid;
 
 import java.util.ArrayList;
 import java.util.HashMap;

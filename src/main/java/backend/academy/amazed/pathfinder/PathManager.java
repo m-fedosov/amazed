@@ -1,7 +1,9 @@
-package backend.academy.amazed;
+package backend.academy.amazed.pathfinder;
+
+import backend.academy.amazed.skeleton.MazeGrid;
 
 public class PathManager {
-    MazeGrid findPath(int pathAlgorithmChoice, MazeGrid mazeGrid) throws Exception {
+    public MazeGrid findPath(int pathAlgorithmChoice, MazeGrid mazeGrid) throws Exception {
         PathFinder pathFinder = switch (pathAlgorithmChoice) {
             case 1 -> new PathFinderBFS();
             case 2 -> new PathFinderAStar();

@@ -1,7 +1,9 @@
-package backend.academy.amazed;
+package backend.academy.amazed.mazegenerator;
 
-public class MazeManager {
-    MazeGrid generateMaze(int algorithmChoice, MazeGrid mazeGrid) throws Exception {
+import backend.academy.amazed.skeleton.MazeGrid;
+
+public class MazeGeneratorManager {
+    public MazeGrid generateMaze(int algorithmChoice, MazeGrid mazeGrid) throws Exception {
         MazeGenerator generator = switch (algorithmChoice) {
             case 1 -> new MazeGeneratorPrim();
             case 2 -> new MazeGeneratorKruskal();

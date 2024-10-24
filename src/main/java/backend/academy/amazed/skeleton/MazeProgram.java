@@ -1,4 +1,7 @@
-package backend.academy.amazed;
+package backend.academy.amazed.skeleton;
+
+import backend.academy.amazed.mazegenerator.MazeGeneratorManager;
+import backend.academy.amazed.pathfinder.PathManager;
 
 public class MazeProgram {
     private static final int MIN_SIZE = 4;
@@ -12,7 +15,7 @@ public class MazeProgram {
         printWelcomeMessage(console);
 
         MazeInputHandler inputHandler = new MazeInputHandler(console, MIN_SIZE, MAX_SIZE);
-        MazeManager mazeManager = new MazeManager();
+        MazeGeneratorManager mazeManager = new MazeGeneratorManager();
         PathManager pathManager = new PathManager();
 
         mazeGrid = new MazeGrid(inputHandler.height(), inputHandler.width());
